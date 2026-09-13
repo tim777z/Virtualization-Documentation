@@ -1,0 +1,36 @@
+name: ASP-NET-Blog-Sample CI
+
+on:
+  push:
+    paths:
+      - "windows-container-samples/ASP-NET-Blog-Application/**"
+    branches: [master]
+  pull_request:
+    paths:
+      - "windows-container-samples/ASP-NET-Blog-Application/**"
+    branches: [master]
+
+jobs:
+  # ------------------------------------------------------------------
+  # Validate that the blog-database SQL scripts apply cleanly and
+  # produce the expected 28 BlogEngine.NET tables.
+  #
+  # The sample's Dockerfiles (db/Dockerfile, web/Dockerfile) are based
+  # on Windows-only images (microsoft/windowsservercore and
+  # microsoft/mssql-server-2014-express-windows), which cannot be built
+  # on GitHub-hosted runners. The schema scripts themselves are plain
+  # T-SQL, so this job validates them against SQL Server on Linux.
+  # ------------------------------------------------------------------
+  schema-validation:
+    name: "Validate blog database schema"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run schema validation test
+        run: pwsh ./windows-container-samples/ASP-NET-Blog-Application/tests/run-schema-test.ps1
+        env:
+          # The default SA_PASSWORD meets SQL Server complexity requirements.
+          SA_PASSWORD: "P@ssw0rdTest!2024"
