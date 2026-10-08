@@ -1,28 +1,28 @@
-# Partition Property Data Types
+﻿# Partition Property Data Types
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
 ```C
-typedef enum { 
-    WHvPartitionPropertyCodeExtendedVmExits        = 0x00000001, 
-     
-    WHvPartitionPropertyCodeProcessorVendor        = 0x00001000, 
-    WHvPartitionPropertyCodeProcessorFeatures      = 0x00001001, 
-    WHVPartitionPropertyCodeProcessorClFlushSize   = 0x00001002, 
-     
-    WHvPartitionPropertyCodeProcessorCount         = 0x00001fff 
-} WHV_PARTITION_PROPERTY_CODE; 
- 
-typedef struct { 
-    WHV_PARTITION_PROPERTY_CODE PropertyCode; 
-     
-    union { 
-        WHV_EXTENDED_VM_EXITS ExtendedVmExits; // See VID_WHV_IOCTL_GET_CAPABILITY 
-        WHV_PROCESSOR_VENDOR ProcessorVendor; // HV_PROCESSOR_VENDOR 
-        WHV_PROCESSOR_FEATURES ProcessorFeatures; // HV_PARTITION_PROCESSOR_FEATURES 
-        UINT8 ProcessorClFlushSize; 
-    }; 
-} WHV_GET_PARTITION_PROPERTY_OUTPUT; 
+typedef enum {Â 
+    WHvPartitionPropertyCodeExtendedVmExitsÂ Â Â Â Â Â Â  = 0x00000001,Â 
+    Â 
+    WHvPartitionPropertyCodeProcessorVendorÂ Â Â Â Â Â Â  = 0x00001000,Â 
+    WHvPartitionPropertyCodeProcessorFeaturesÂ Â Â Â Â  = 0x00001001,Â 
+    WHVPartitionPropertyCodeProcessorClFlushSizeÂ Â  = 0x00001002,Â 
+    Â 
+    WHvPartitionPropertyCodeProcessorCountÂ Â Â Â Â Â Â Â  = 0x00001fffÂ 
+} WHV_PARTITION_PROPERTY_CODE;Â 
+Â 
+typedef struct {Â 
+    WHV_PARTITION_PROPERTY_CODE PropertyCode;Â 
+    Â 
+    union {Â 
+        WHV_EXTENDED_VM_EXITS ExtendedVmExits; // See VID_WHV_IOCTL_GET_CAPABILITYÂ 
+        WHV_PROCESSOR_VENDOR ProcessorVendor; // HV_PROCESSOR_VENDORÂ 
+        WHV_PROCESSOR_FEATURES ProcessorFeatures; // HV_PARTITION_PROCESSOR_FEATURESÂ 
+        UINT8 ProcessorClFlushSize;Â 
+    };Â 
+} WHV_GET_PARTITION_PROPERTY_OUTPUT;Â 
 ```
 
 

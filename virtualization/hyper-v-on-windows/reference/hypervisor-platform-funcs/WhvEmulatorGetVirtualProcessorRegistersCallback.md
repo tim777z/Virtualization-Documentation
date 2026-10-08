@@ -1,4 +1,4 @@
-# WHV_EMULATOR_GET_VIRTUAL_PROCESSOR_REGISTERS_CALLBACK
+﻿# WHV_EMULATOR_GET_VIRTUAL_PROCESSOR_REGISTERS_CALLBACK
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax

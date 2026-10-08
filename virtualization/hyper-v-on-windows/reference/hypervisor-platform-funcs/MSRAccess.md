@@ -1,4 +1,4 @@
-# MSR Access
+﻿# MSR Access
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
@@ -32,6 +32,6 @@ typedef struct WHV_X64_MSR_ACCESS_CONTEXT
 
 ## Return Value
 
-Information about exits caused by the virtual processor accessing a model specific register (MSR) using the RDMSR or WRMSR instructions is provided in the `WHV_X64_MSR_ACCESS_CONTEXT` structure. 
+Information about exits caused by the virtual processor accessing a model specific register (MSR) using the RDMSR or WRMSR instructions is provided in the `WHV_X64_MSR_ACCESS_CONTEXT` structure.Â 
 
-Exits for MSR accesses are only generated if they are enabled by setting the `WHV_EXTENDED_VM_EXITS.MsrExit` property for the partition. 
+Exits for MSR accesses are only generated if they are enabled by setting the `WHV_EXTENDED_VM_EXITS.MsrExit` property for the partition.Â 

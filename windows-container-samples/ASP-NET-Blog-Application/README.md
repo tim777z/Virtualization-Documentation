@@ -17,6 +17,7 @@ beyond being a walkthrough of Windows container networking.
 
 ## Prerequisites
 
+### Windows Containers (Full Stack)
 - Docker for Windows configured for **Windows containers** (the Dockerfiles
   are based on `microsoft/windowsservercore` and
   `microsoft/mssql-server-2014-express-windows`, which are Windows-only
@@ -25,14 +26,27 @@ beyond being a walkthrough of Windows container networking.
   BlogEngine.NET; no local .NET SDK is required because the web image
   downloads and installs the app at build time.
 
+### Linux/macOS (Database Only - for CI and Schema Testing)
+- Docker with Linux containers (default on Linux/macOS, Docker Desktop on Windows)
+- The SQL schema scripts are plain T-SQL and work with SQL Server on Linux.
+- Use `docker-compose.linux.yml` for database-only validation.
+
 ## Build and run
 
+### Windows Containers (Full Stack)
 ```bash
 docker-compose build
 docker-compose up
 ```
 
 The web app is then available at `http://localhost/`.
+
+### Linux/macOS (Database Only)
+```bash
+docker compose -f docker-compose.linux.yml up -d
+# Run schema validation tests
+pwsh ./tests/schema.Tests.ps1
+```
 
 ### Environment variables
 
@@ -56,27 +70,40 @@ docker run -it --name "db" -p 1433:1433 <db container image>
 docker run -it -p 80:80 <web container image>
 ```
 
-Base images:
+Base images (Windows):
 
 ```bash
 docker pull microsoft/windowsservercore
 docker pull microsoft/mssql-server-2014-express-windows
 ```
 
+Base image (Linux DB only):
+
+```bash
+docker pull mcr.microsoft.com/mssql/server:2019-latest
+```
+
 ## Testing
 
-The schema scripts are validated by an automated test that starts a
-disposable SQL Server container, applies both `db/*.sql` scripts, and asserts
-that all 28 BlogEngine.NET tables exist:
+The schema scripts are validated by automated Pester tests that start a
+disposable SQL Server container, apply both `db/*.sql` scripts, and assert
+that all 28 BlogEngine.NET tables exist with proper primary keys and foreign
+key constraints:
 
+```bash
+# Run Pester tests (requires Pester module: Install-Module -Name Pester)
+Invoke-Pester ./tests/schema.Tests.ps1 -Output Detailed
+```
+
+Or using the legacy script (deprecated, kept for compatibility):
 ```bash
 pwsh ./tests/run-schema-test.ps1
 ```
 
-The test runs in CI (`.github/workflows/asp-net-blog-sample.yml`) on every
-push / pull request that touches this sample. Any edit to
+The Pester tests run in CI (`.github/workflows/asp-net-blog-sample.yml`) on
+every push / pull request that touches this sample. Any edit to
 `db/Setup-blogdatabase.sql` or `db/Setup-blogtables.sql` must land in the
-same commit as the corresponding update to `tests/run-schema-test.ps1`.
+same commit as the corresponding update to `tests/schema.Tests.ps1`.
 
 ## Notes
 

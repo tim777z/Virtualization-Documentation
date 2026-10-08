@@ -1,4 +1,4 @@
----
+﻿---
 title: Make your own integration services
 description: Windows 10 integration services.
 keywords: windows 10, hyper-v, HVSocket, AF_HYPERV
@@ -150,11 +150,11 @@ struct SOCKADDR_HV
 ```
 
 In lieu of an IP or hostname, AF_HYPERV endpoints rely heavily on two GUIDs:  
-* VM ID – this is the unique ID assigned per VM.  A VM’s ID can be found using the following PowerShell snippet.  
+* VM ID â€“ this is the unique ID assigned per VM.  A VMâ€™s ID can be found using the following PowerShell snippet.  
   ```PowerShell
   (Get-VM -Name $VMName).Id
   ```
-* Service ID – GUID, [described above](#RegisterANewApplication), with which the application is registered in the Hyper-V host registry.
+* Service ID â€“ GUID, [described above](#RegisterANewApplication), with which the application is registered in the Hyper-V host registry.
 
 There is also a set of VMID wildcards available when a connection isn't to a specific virtual machine.
  
