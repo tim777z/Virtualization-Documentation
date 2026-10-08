@@ -1,4 +1,4 @@
-# Unrecoverable Exception
+﻿# Unrecoverable Exception
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
@@ -15,4 +15,4 @@ typedef struct WHV_UNRECOVERABLE_EXCEPTION_CONTEXT
 ```
 
 ## Return Value
-An exit for an unrecoverable error is caused by the virtual processor generating an exception that cannot be delivered (triple fault). 
+An exit for an unrecoverable error is caused by the virtual processor generating an exception that cannot be delivered (triple fault).Â 

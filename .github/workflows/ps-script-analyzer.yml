@@ -1,0 +1,37 @@
+name: PowerShell Script Analysis
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**/*.ps1"
+      - "**/*.psm1"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**/*.ps1"
+      - "**/*.psm1"
+
+jobs:
+  ps-script-analyzer:
+    name: "Analyze PowerShell scripts with PSScriptAnalyzer"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Import-Module PSScriptAnalyzer
+          $results = Invoke-ScriptAnalyzer -Path . -Recurse -Include *.ps1,*.psm1 -Severity Error,Warning
+          if ($results) {
+            $results | Format-Table RuleName, Severity, File, Line, Message -AutoSize | Out-Host
+            throw "PSScriptAnalyzer found issues (see above)"
+          } else {
+            Write-Host "No issues found." -ForegroundColor Green
+          }

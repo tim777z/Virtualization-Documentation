@@ -11,3 +11,4 @@ _site/
 packages.config
 *~
 *.swp
+node_modules/

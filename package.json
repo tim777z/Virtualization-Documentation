@@ -1,0 +1,16 @@
+{
+  "name": "virtualization-documentation",
+  "version": "1.0.0",
+  "description": "Documentation and sample code for Microsoft Windows virtualization and container technologies",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint-cli \"**/*.md\" --ignore node_modules --ignore \".git\"",
+    "lint:md:fix": "markdownlint-cli \"**/*.md\" --ignore node_modules --ignore \".git\" --fix"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.41.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   db:
@@ -17,21 +17,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile.linux
-    ports:
-      - "80:80"
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      - DB_HOST=db
-      - DB_NAME=${DB_NAME:-blogengine_db}
-      - DB_USER=${DB_USER:-sa}
-      - DB_PASSWORD=${DB_PASSWORD:-Password123}
 
 networks:
   default:

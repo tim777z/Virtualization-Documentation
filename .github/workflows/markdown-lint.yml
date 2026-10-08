@@ -1,0 +1,39 @@
+name: Markdown Lint
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "virtualization/**/*.md"
+      - "README.md"
+      - "SECURITY.md"
+      - "ARCHITECTURE.md"
+      - "TODO.md"
+  pull_request:
+    branches: [master]
+    paths:
+      - "virtualization/**/*.md"
+      - "README.md"
+      - "SECURITY.md"
+      - "ARCHITECTURE.md"
+      - "TODO.md"
+
+jobs:
+  markdown-lint:
+    name: "Lint Markdown files"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install markdownlint-cli
+        run: npm ci
+
+      - name: Run markdownlint
+        run: npx markdownlint-cli "virtualization/**/*.md" "README.md" "SECURITY.md" "ARCHITECTURE.md" "TODO.md" --ignore node_modules --ignore ".git" --config .markdownlint.json

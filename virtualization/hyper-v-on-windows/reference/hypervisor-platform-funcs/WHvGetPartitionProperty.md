@@ -1,4 +1,4 @@
-# WHvGetPartitionProperty
+﻿# WHvGetPartitionProperty
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
@@ -54,11 +54,11 @@ Specifies the property that is queried
 
 `PropertyBuffer` 
 
-Specifies the output buffer that receives the value of the requested property. 
+Specifies the output buffer that receives the value of the requested property.Â 
 
 `PropertyBufferSizeInBytes` 
 
-Specifies the size of the output buffer, in bytes. For the currently available set of properties, the buffer should be large enough to hold a 64-bit value.  
+Specifies the size of the output buffer, in bytes. For the currently available set of properties, the buffer should be large enough to hold a 64-bit value.Â Â 
 
 ## Remarks
 

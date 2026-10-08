@@ -1,4 +1,4 @@
-# I/O Port Access
+﻿# I/O Port Access
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
@@ -41,4 +41,4 @@ typedef struct WHV_X64_IO_PORT_ACCESS_CONTEXT
 
 ## Return Value
 
-Information about exits caused by the virtual processor executing an I/O port instruction (IN, OUT, INS, and OUTS) is provided in the `WHV_X64_IO_PORT_ACCESS_CONTEXT` structure. The context information includes the I/O port address, which allows the virtualization stack to forward the exit to the device emulation logic of the device that uses the I/O port accessed by the virtual processor. 
+Information about exits caused by the virtual processor executing an I/O port instruction (IN, OUT, INS, and OUTS) is provided in the `WHV_X64_IO_PORT_ACCESS_CONTEXT` structure. The context information includes the I/O port address, which allows the virtualization stack to forward the exit to the device emulation logic of the device that uses the I/O port accessed by the virtual processor.Â 

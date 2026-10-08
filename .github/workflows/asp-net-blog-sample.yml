@@ -29,8 +29,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run schema validation test
-        run: pwsh ./windows-container-samples/ASP-NET-Blog-Application/tests/run-schema-test.ps1
+      - name: Install Pester
+        run: Install-Module -Name Pester -Force -Scope CurrentUser -Repository PSGallery
+
+      - name: Run schema validation tests (Pester)
+        run: |
+          Import-Module Pester
+          Invoke-Pester ./windows-container-samples/ASP-NET-Blog-Application/tests/schema.Tests.ps1 -Output Detailed
         env:
-          # The default SA_PASSWORD meets SQL Server complexity requirements.
-          SA_PASSWORD: "P@ssw0rdTest!2024"
+          # SA_PASSWORD is provided via GitHub Actions secret SA_PASSWORD_TEST
+          # Configure in repository Settings > Secrets and variables > Actions
+          SA_PASSWORD: ${{ secrets.SA_PASSWORD_TEST }}

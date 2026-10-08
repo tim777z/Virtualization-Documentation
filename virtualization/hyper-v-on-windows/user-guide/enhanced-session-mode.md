@@ -1,4 +1,4 @@
----
+﻿---
 title: Share devices with Windows virtual machines
 description: Walks you through sharing devices with Hyper-V virtual machines (USB, audio, microphone, and mounted drives)
 keywords: windows 10, hyper-v

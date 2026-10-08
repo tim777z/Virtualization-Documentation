@@ -1,4 +1,4 @@
-# WHV_EMULATOR_TRANSLATE_GVA_PAGE_CALLBACK
+﻿# WHV_EMULATOR_TRANSLATE_GVA_PAGE_CALLBACK
 **Note: These APIs are not yet publically available and will be included in a future Windows release.**
 
 ## Syntax
