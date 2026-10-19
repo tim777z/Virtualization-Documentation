@@ -5,12 +5,16 @@
   "private": true,
   "scripts": {
     "lint:md": "markdownlint-cli \"**/*.md\" --ignore node_modules --ignore \".git\"",
-    "lint:md:fix": "markdownlint-cli \"**/*.md\" --ignore node_modules --ignore \".git\" --fix"
+    "lint:md:fix": "markdownlint-cli \"**/*.md\" --ignore node_modules --ignore \".git\" --fix",
+    "test": "npm run lint:md",
+    "test:ci": "npm run lint:md",
+    "prepare": "npm run lint:md"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.41.0"
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "packageManager": "npm@10.8.2"
 }
