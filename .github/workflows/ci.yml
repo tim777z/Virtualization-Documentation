@@ -1,0 +1,188 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ------------------------------------------------------------------
+  # Markdown linting - runs on all markdown files
+  # ------------------------------------------------------------------
+  markdown-lint:
+    name: "Markdown Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run markdownlint
+        run: npx markdownlint-cli "**/*.md" --ignore node_modules --ignore ".git" --config .markdownlint.json
+
+  # ------------------------------------------------------------------
+  # PowerShell script analysis - runs on all .ps1, .psm1, .psd1 files
+  # ------------------------------------------------------------------
+  ps-script-analyzer:
+    name: "PowerShell Script Analysis"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Import-Module PSScriptAnalyzer
+          $results = Invoke-ScriptAnalyzer -Path . -Recurse -Include *.ps1,*.psm1,*.psd1 -Severity Error,Warning
+          if ($results) {
+            $results | Format-Table RuleName, Severity, File, Line, Message -AutoSize | Out-Host
+            foreach ($r in $results) {
+              $level = if ($r.Severity -eq 'Error') { 'error' } else { 'warning' }
+              echo "::$level file={$r.File},line={$r.Line}::{($r.RuleName)} {$r.Message}"
+            }
+            throw "PSScriptAnalyzer found issues"
+          } else {
+            Write-Host "No issues found." -ForegroundColor Green
+          }
+
+  # ------------------------------------------------------------------
+  # ASP.NET Blog Sample validation - schema tests, docker compose, env
+  # ------------------------------------------------------------------
+  asp-net-blog-sample:
+    name: "ASP.NET Blog Sample Validation"
+    uses: ./.github/workflows/asp-net-blog-sample.yml
+    secrets: inherit
+
+  # ------------------------------------------------------------------
+  # Security checks - secret scanning, dependency review
+  # ------------------------------------------------------------------
+  security:
+    name: "Security Checks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for committed secrets (basic patterns)
+        run: |
+          # Check for common secret patterns in tracked files
+          patterns=(
+            "AKIA[0-9A-Z]{16}"                    # AWS Access Key
+            "ghp_[0-9a-zA-Z]{36}"                 # GitHub Personal Access Token
+            "ghs_[0-9a-zA-Z]{36}"                 # GitHub Secret
+            "github_pat_[0-9a-zA-Z]{22}_[0-9a-zA-Z]{59}" # GitHub Fine-grained PAT
+            "sk-[0-9a-zA-Z]{48}"                  # OpenAI API Key
+            "xoxb-[0-9]{12}-[0-9]{12}-[0-9a-zA-Z]{24}"   # Slack Bot Token
+            "xoxp-[0-9]{12}-[0-9]{12}-[0-9]{12}-[0-9a-zA-Z]{32}" # Slack User Token
+            "AIza[0-9A-Za-z\\-_]{35}"             # Google API Key
+            "ya29\\.[0-9A-Za-z\\-_]+"             # Google OAuth Token
+            "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----" # Private Keys
+          )
+          found=0
+          for pattern in "${patterns[@]}"; do
+            if git grep -E "$pattern" -- "*.md" "*.txt" "*.json" "*.yml" "*.yaml" "*.ps1" "*.psm1" "*.sql" ":!.git" 2>/dev/null; then
+              echo "POTENTIAL SECRET FOUND: $pattern"
+              found=1
+            fi
+          done
+          if [ $found -eq 1 ]; then
+            echo "::warning::Potential secrets detected in repository. Review and rotate if necessary."
+          else
+            echo "No common secret patterns detected."
+          fi
+
+      - name: Verify .gitignore excludes sensitive files
+        run: |
+          required_ignores=("*.env" "*.env.local" "*.pem" "*.key" "*.pfx" "*.cer" "*.crt" "id_rsa*" "id_ed25519*" "*.kubeconfig" "*.ovpn")
+          missing=0
+          for pattern in "${required_ignores[@]}"; do
+            if ! git check-ignore -q --stdin <<< "test/$pattern" 2>/dev/null; then
+              # Check if pattern is in .gitignore
+              if ! grep -qE "^${pattern//\*/\\*}$" .gitignore; then
+                echo "WARNING: $pattern not in .gitignore"
+                missing=1
+              fi
+            fi
+          done
+          if [ $missing -eq 0 ]; then
+            echo "Common sensitive file patterns are ignored."
+          fi
+
+  # ------------------------------------------------------------------
+  # Documentation build validation (DocFX/Open Publishing)
+  # ------------------------------------------------------------------
+  docs-build:
+    name: "Documentation Build Validation"
+    runs-on: ubuntu-latest
+    if: false  # Disabled until DocFX is configured in CI
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install DocFX
+        run: dotnet tool install -g docfx
+
+      - name: Build documentation
+        run: |
+          cd virtualization
+          docfx build --output ../_site
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-build
+          path: _site/
+          retention-days: 7
+
+  # ------------------------------------------------------------------
+  # Summary job - reports overall status
+  # ------------------------------------------------------------------
+  summary:
+    name: "CI Summary"
+    runs-on: ubuntu-latest
+    needs: [markdown-lint, ps-script-analyzer, asp-net-blog-sample, security]
+    if: always()
+    steps:
+      - name: Check job statuses
+        run: |
+          echo "Job statuses:"
+          echo "  markdown-lint: ${{ needs.markdown-lint.result }}"
+          echo "  ps-script-analyzer: ${{ needs.ps-script-analyzer.result }}"
+          echo "  asp-net-blog-sample: ${{ needs.asp-net-blog-sample.result }}"
+          echo "  security: ${{ needs.security.result }}"
+          
+          failed=0
+          for job in markdown-lint ps-script-analyzer asp-net-blog-sample security; do
+            result="${{ needs.$job.result }}"
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "FAILED: $job ($result)"
+              failed=1
+            fi
+          done
+          
+          if [ $failed -eq 1 ]; then
+            echo "::error::One or more CI jobs failed"
+            exit 1
+          else
+            echo "All CI jobs passed!"
+          fi

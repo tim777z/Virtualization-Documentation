@@ -2,21 +2,15 @@ name: Markdown Lint
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
     paths:
-      - "virtualization/**/*.md"
-      - "README.md"
-      - "SECURITY.md"
-      - "ARCHITECTURE.md"
-      - "TODO.md"
+      - "**/*.md"
+      - ".markdownlint.json"
   pull_request:
-    branches: [master]
+    branches: [main, master]
     paths:
-      - "virtualization/**/*.md"
-      - "README.md"
-      - "SECURITY.md"
-      - "ARCHITECTURE.md"
-      - "TODO.md"
+      - "**/*.md"
+      - ".markdownlint.json"
 
 jobs:
   markdown-lint:
@@ -29,11 +23,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'npm'
 
       - name: Install markdownlint-cli
         run: npm ci
 
       - name: Run markdownlint
-        run: npx markdownlint-cli "virtualization/**/*.md" "README.md" "SECURITY.md" "ARCHITECTURE.md" "TODO.md" --ignore node_modules --ignore ".git" --config .markdownlint.json
+        run: npx markdownlint-cli "**/*.md" --ignore node_modules --ignore ".git" --config .markdownlint.json
+
+      - name: Annotate markdownlint results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: markdownlint-results
+          path: markdownlint-results.json
+          retention-days: 7
